@@ -16,45 +16,35 @@ export default function IconForge() {
   const [selected, setSelected] = useState(0)
   const [strokeWidth, setStrokeWidth] = useState(2)
   const [size, setSize] = useState(48)
-  const [color, setColor] = useState('#be123c')
+  const [color, setColor] = useState('#fb7185')
   const [filled, setFilled] = useState(false)
   const [roundLinecap, setRoundLinecap] = useState(true)
   const [rotation, setRotation] = useState(0)
 
   const icon = baseIcons[selected]
-
   const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${filled ? color : 'none'}" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="${roundLinecap ? 'round' : 'butt'}" stroke-linejoin="${roundLinecap ? 'round' : 'miter'}" ${rotation ? `transform="rotate(${rotation} 12 12)"` : ''}>${icon.paths.map(p => `<path d="${p}"/>`).join('')}</svg>`
 
   const downloadSvg = () => {
     const blob = new Blob([svgContent], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = `${icon.name.toLowerCase()}.svg`; a.click()
-    URL.revokeObjectURL(url)
+    const url = URL.createObjectURL(blob); const a = document.createElement('a')
+    a.href = url; a.download = `${icon.name.toLowerCase()}.svg`; a.click(); URL.revokeObjectURL(url)
   }
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display font-bold text-3xl tracking-tight" style={{ color: 'var(--color-coral)' }}>
-          Icon Forge
-        </h1>
+        <h1 className="font-display font-bold text-3xl tracking-tight text-coral">Icon Forge</h1>
         <p className="text-ink-secondary mt-1">Customize SVG icons. Adjust stroke, size, fills. Export.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Icon picker */}
-        <div className="rounded-xl border border-border-subtle bg-surface-1 p-6 space-y-4">
-          <h2 className="font-display font-semibold text-sm">Base Icon</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="rounded-xl border border-border bg-surface-1 p-6 space-y-4">
+          <h2 className="font-display font-semibold text-sm text-ink-primary">Base Icon</h2>
           <div className="grid grid-cols-4 gap-2">
             {baseIcons.map((ic, i) => (
-              <button
-                key={ic.name}
-                onClick={() => setSelected(i)}
-                className={`aspect-square rounded-xl flex items-center justify-center cursor-pointer transition-all ${
-                  selected === i ? 'bg-coral/10 ring-2 ring-coral' : 'bg-surface-0 hover:bg-surface-2'
-                }`}
-              >
+              <button key={ic.name} onClick={() => setSelected(i)}
+                className={`aspect-square rounded-xl flex items-center justify-center cursor-pointer transition-all ${selected === i ? 'ring-2 ring-coral' : 'bg-surface-2 hover:bg-surface-3'}`}
+                style={{ background: selected === i ? 'var(--color-coral-dim)' : undefined }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke={selected === i ? color : 'var(--color-ink-muted)'} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
                   {ic.paths.map((p, j) => <path key={j} d={p} />)}
                 </svg>
@@ -62,75 +52,46 @@ export default function IconForge() {
             ))}
           </div>
 
-          {/* Controls */}
           <div className="space-y-3 pt-2">
-            <div className="space-y-1">
-              <label className="text-xs font-mono text-ink-muted">Stroke: {strokeWidth}px</label>
-              <input type="range" min={0.5} max={4} step={0.5} value={strokeWidth} onChange={e => setStrokeWidth(+e.target.value)}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-surface-3" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-mono text-ink-muted">Size: {size}px</label>
-              <input type="range" min={16} max={128} value={size} onChange={e => setSize(+e.target.value)}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-surface-3" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-mono text-ink-muted">Rotation: {rotation}&deg;</label>
-              <input type="range" min={0} max={360} value={rotation} onChange={e => setRotation(+e.target.value)}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-surface-3" />
-            </div>
+            {[
+              { label: 'Stroke', value: strokeWidth, set: setStrokeWidth, min: 0.5, max: 4, step: 0.5 },
+              { label: 'Size', value: size, set: setSize, min: 16, max: 128, step: 1 },
+              { label: 'Rotation', value: rotation, set: setRotation, min: 0, max: 360, step: 1 },
+            ].map(c => (
+              <div key={c.label} className="space-y-1">
+                <label className="text-[10px] font-mono text-ink-muted">{c.label}: {c.value}{c.label === 'Rotation' ? '°' : c.label === 'Stroke' ? 'px' : 'px'}</label>
+                <input type="range" min={c.min} max={c.max} step={c.step} value={c.value} onChange={e => c.set(+e.target.value)} className="w-full" />
+              </div>
+            ))}
             <div className="flex gap-3 items-center">
-              <input type="color" value={color} onChange={e => setColor(e.target.value)}
-                className="w-10 h-10 rounded-lg cursor-pointer border-0" />
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={filled} onChange={e => setFilled(e.target.checked)} className="cursor-pointer" />
-                Fill
+              <input type="color" value={color} onChange={e => setColor(e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent" />
+              <label className="flex items-center gap-2 text-sm cursor-pointer text-ink-secondary">
+                <input type="checkbox" checked={filled} onChange={e => setFilled(e.target.checked)} className="cursor-pointer accent-coral" /> Fill
               </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={roundLinecap} onChange={e => setRoundLinecap(e.target.checked)} className="cursor-pointer" />
-                Round
+              <label className="flex items-center gap-2 text-sm cursor-pointer text-ink-secondary">
+                <input type="checkbox" checked={roundLinecap} onChange={e => setRoundLinecap(e.target.checked)} className="cursor-pointer accent-coral" /> Round
               </label>
             </div>
           </div>
-
-          <button onClick={downloadSvg}
-            className="w-full px-4 py-2.5 rounded-lg bg-coral text-white font-medium text-sm hover:opacity-90 transition-opacity cursor-pointer">
-            Export SVG
-          </button>
+          <button onClick={downloadSvg} className="w-full px-4 py-2.5 rounded-lg bg-coral text-ink-inverse font-medium text-sm hover:opacity-90 transition-opacity cursor-pointer">Export SVG</button>
         </div>
 
-        {/* Preview */}
-        <div className="lg:col-span-2 rounded-xl border border-border-subtle bg-surface-1 flex flex-col">
-          <div className="p-4 border-b border-border-subtle flex items-center justify-between">
+        <div className="lg:col-span-2 rounded-xl border border-border bg-surface-1 flex flex-col">
+          <div className="p-4 border-b border-border flex items-center justify-between">
             <span className="font-mono text-xs text-ink-muted">Preview</span>
             <span className="font-mono text-xs text-ink-muted">{icon.name} &mdash; {size}x{size}</span>
           </div>
           <div className="flex-1 flex items-center justify-center p-12">
-            <motion.div
-              key={selected}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill={filled ? color : 'none'}
-                stroke={color}
-                strokeWidth={strokeWidth}
-                strokeLinecap={roundLinecap ? 'round' : 'butt'}
-                strokeLinejoin={roundLinecap ? 'round' : 'miter'}
-                style={{ width: size, height: size, transform: `rotate(${rotation}deg)` }}
-              >
+            <motion.div key={selected} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
+              <svg viewBox="0 0 24 24" fill={filled ? color : 'none'} stroke={color} strokeWidth={strokeWidth}
+                strokeLinecap={roundLinecap ? 'round' : 'butt'} strokeLinejoin={roundLinecap ? 'round' : 'miter'}
+                style={{ width: size, height: size, transform: `rotate(${rotation}deg)` }}>
                 {icon.paths.map((p, i) => <path key={i} d={p} />)}
               </svg>
             </motion.div>
           </div>
-
-          {/* SVG Code */}
-          <div className="border-t border-border-subtle p-4">
-            <pre className="font-mono text-xs text-ink-muted overflow-x-auto whitespace-pre-wrap break-all">
-              {svgContent}
-            </pre>
+          <div className="border-t border-border p-4">
+            <pre className="font-mono text-xs text-ink-muted overflow-x-auto whitespace-pre-wrap break-all">{svgContent}</pre>
           </div>
         </div>
       </div>

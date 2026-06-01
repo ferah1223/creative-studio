@@ -1,110 +1,62 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
   Palette, Type, Grid3x3, PenTool, Cpu, Code2,
-  ChevronLeft, ChevronRight, Sparkles
+  Sparkles
 } from 'lucide-react'
 
 const tools = [
-  { path: '/color-lab', label: 'Color Lab', icon: Palette, color: 'var(--color-violet)', bg: 'var(--color-violet-soft)' },
-  { path: '/typography', label: 'Typography', icon: Type, color: 'var(--color-navy)', bg: 'var(--color-navy-soft)' },
-  { path: '/patterns', label: 'Patterns', icon: Grid3x3, color: 'var(--color-amber)', bg: 'var(--color-amber-soft)' },
-  { path: '/icons', label: 'Icon Forge', icon: PenTool, color: 'var(--color-coral)', bg: 'var(--color-coral-soft)' },
-  { path: '/shaders', label: 'Shaders', icon: Cpu, color: 'var(--color-cyan)', bg: 'var(--color-cyan-soft)' },
-  { path: '/tokens', label: 'Tokens', icon: Code2, color: 'var(--color-emerald)', bg: 'var(--color-emerald-soft)' },
+  { path: '/color-lab', label: 'Color Lab', icon: Palette, color: 'var(--color-violet)', dim: 'var(--color-violet-dim)' },
+  { path: '/typography', label: 'Typography', icon: Type, color: 'var(--color-navy)', dim: 'var(--color-navy-dim)' },
+  { path: '/patterns', label: 'Patterns', icon: Grid3x3, color: 'var(--color-amber)', dim: 'var(--color-amber-dim)' },
+  { path: '/icons', label: 'Icon Forge', icon: PenTool, color: 'var(--color-coral)', dim: 'var(--color-coral-dim)' },
+  { path: '/shaders', label: 'Shaders', icon: Cpu, color: 'var(--color-cyan)', dim: 'var(--color-cyan-dim)' },
+  { path: '/tokens', label: 'Tokens', icon: Code2, color: 'var(--color-emerald)', dim: 'var(--color-emerald-dim)' },
 ]
 
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
   const location = useLocation()
 
   return (
     <>
-      {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 py-3 bg-surface-0/80 backdrop-blur-xl border-b border-border-subtle">
-        <NavLink to="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-ink-primary flex items-center justify-center">
+      {/* Desktop sidebar */}
+      <aside className="fixed top-0 left-0 h-dvh w-[220px] z-50 hidden md:flex flex-col bg-surface-0/80 backdrop-blur-xl border-r border-border">
+        {/* Logo */}
+        <NavLink to="/" className="flex items-center gap-3 px-5 h-16 border-b border-border shrink-0 hover:bg-surface-1/50 transition-colors">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--color-violet), var(--color-cyan))' }}>
             <Sparkles className="w-4 h-4 text-ink-inverse" />
           </div>
-          <span className="font-display font-semibold text-lg tracking-tight">Studio</span>
+          <div>
+            <span className="font-display font-bold text-sm tracking-tight text-ink-primary">Creative Studio</span>
+          </div>
         </NavLink>
-      </div>
-
-      {/* Sidebar */}
-      <motion.aside
-        animate={{ width: collapsed ? 72 : 256 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 h-dvh z-50 hidden md:flex flex-col bg-surface-1/60 backdrop-blur-xl border-r border-border-subtle"
-      >
-        {/* Logo */}
-        <div className="flex items-center justify-between px-4 h-16 border-b border-border-subtle">
-          <NavLink to="/" className="flex items-center gap-3 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-ink-primary flex items-center justify-center shrink-0">
-              <Sparkles className="w-4.5 h-4.5 text-ink-inverse" />
-            </div>
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.span
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: 'auto' }}
-                  exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="font-display font-semibold text-lg tracking-tight whitespace-nowrap"
-                >
-                  Creative Studio
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </NavLink>
-          <button
-            onClick={() => setCollapsed(c => !c)}
-            className="w-7 h-7 rounded-md flex items-center justify-center text-ink-muted hover:text-ink-primary hover:bg-surface-2 transition-colors cursor-pointer shrink-0"
-          >
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
-        </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {tools.map(({ path, label, icon: Icon, color, bg }) => {
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          <p className="px-3 mb-2 text-[10px] font-mono uppercase tracking-[0.15em] text-ink-muted">Tools</p>
+          {tools.map(({ path, label, icon: Icon, color, dim }) => {
             const active = location.pathname === path
             return (
               <NavLink
                 key={path}
                 to={path}
-                className="group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer"
+                className="group relative flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer text-sm"
                 style={{
-                  background: active ? bg : 'transparent',
+                  background: active ? dim : 'transparent',
                   color: active ? color : 'var(--color-ink-secondary)',
                 }}
               >
+                <div
+                  className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors duration-200"
+                  style={{
+                    background: active ? color + '20' : 'var(--color-surface-2)',
+                    color: active ? color : 'var(--color-ink-muted)',
+                  }}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                </div>
+                <span className="font-medium">{label}</span>
                 {active && (
-                  <motion.div
-                    layoutId="sidebar-active"
-                    className="absolute inset-0 rounded-lg"
-                    style={{ background: bg }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                  />
-                )}
-                <Icon className="w-5 h-5 relative z-10 shrink-0" style={{ color: active ? color : undefined }} />
-                <AnimatePresence>
-                  {!collapsed && (
-                    <motion.span
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: 'auto' }}
-                      exit={{ opacity: 0, width: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="relative z-10 text-sm font-medium whitespace-nowrap overflow-hidden"
-                    >
-                      {label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-                {collapsed && (
-                  <div className="absolute left-full ml-2 px-2 py-1 rounded-md bg-ink-primary text-ink-inverse text-xs font-medium opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                    {label}
-                  </div>
+                  <div className="absolute right-3 w-1.5 h-1.5 rounded-full" style={{ background: color }} />
                 )}
               </NavLink>
             )
@@ -112,39 +64,27 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-border-subtle">
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-xs text-ink-muted"
-              >
-                6 tools for designers
-              </motion.p>
-            )}
-          </AnimatePresence>
+        <div className="px-5 py-4 border-t border-border">
+          <p className="text-[10px] text-ink-muted font-mono">v1.0.0</p>
         </div>
-      </motion.aside>
+      </aside>
 
       {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 flex items-center justify-around px-2 py-2 bg-surface-0/90 backdrop-blur-xl border-t border-border-subtle safe-area-pb">
-        {tools.map(({ path, icon: Icon, color, label }) => {
-          const active = location.pathname === path
-          return (
-            <NavLink
-              key={path}
-              to={path}
-              className="flex flex-col items-center gap-0.5 px-2 py-1"
-            >
-              <Icon className="w-5 h-5" style={{ color: active ? color : 'var(--color-ink-muted)' }} />
-              <span className="text-[10px] font-medium" style={{ color: active ? color : 'var(--color-ink-muted)' }}>
-                {label.split(' ')[0]}
-              </span>
-            </NavLink>
-          )
-        })}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-0/90 backdrop-blur-xl border-t border-border">
+        <div className="flex items-center justify-around px-2 py-2">
+          {tools.map(({ path, icon: Icon, color, label }) => {
+            const active = location.pathname === path
+            return (
+              <NavLink key={path} to={path} className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors"
+                style={{ background: active ? 'var(--color-surface-2)' : 'transparent' }}>
+                <Icon className="w-5 h-5" style={{ color: active ? color : 'var(--color-ink-muted)' }} />
+                <span className="text-[10px] font-medium" style={{ color: active ? color : 'var(--color-ink-muted)' }}>
+                  {label.split(' ')[0]}
+                </span>
+              </NavLink>
+            )
+          })}
+        </div>
       </div>
     </>
   )
